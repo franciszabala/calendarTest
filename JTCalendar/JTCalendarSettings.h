@@ -1,0 +1,44 @@
+//
+//  JTCalendarSettings.h
+//  JTCalendar
+//
+//  Created by Jonathan Tribouharet
+//
+
+#import <Foundation/Foundation.h>
+
+typedef NS_ENUM(NSInteger, JTCalendarWeekDayFormat) {
+    JTCalendarWeekDayFormatSingle,
+    JTCalendarWeekDayFormatShort,
+    JTCalendarWeekDayFormatFull
+};
+
+@interface JTCalendarSettings : NSObject
+
+
+// Content view
+
+@property (nonatomic) BOOL pageViewHideWhenPossible;
+@property (nonatomic) BOOL weekModeEnabled;
+
+
+// Page view
+
+// Must be less or equalt to 6, 0 for automatic
+@property (nonatomic) NSUInteger pageViewNumberOfWeeks;
+@property (nonatomic) BOOL pageViewHaveWeekDaysView;
+
+
+// WeekDay view
+
+@property (nonatomic) JTCalendarWeekDayFormat weekDayFormat;
+
+// Resize on screen height change
+
+@property (nonatomic) BOOL isResizeAutomatic;
+
+
+// Use for override
+- (void)commonInit;
+
+@end
