@@ -31,6 +31,8 @@
     CGRect topFrameClosed;
     
     NSDate *_dateSelected;
+    
+    UIView *monthOverlay;
 }
 @end
 
@@ -85,7 +87,15 @@ static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
     
     //[self createTableViewItems];
     
+    monthOverlay = [UIView new];
+    monthOverlay.frame = CGRectMake(0.0f, 65.0f, 320.0f, 480.0f);
+    UIColor *monthOverlayColor = [UIColor colorWithRed:117/255.0f green:117/255.0f blue:117/255.0f alpha:0.25f];
     
+    
+    monthOverlay.backgroundColor = monthOverlayColor;
+    monthOverlay.userInteractionEnabled = NO;
+    //monthOverlay.opaque = NO;
+   
     
     calendarManager = [JTCalendarManager new];
     calendarManager.delegate = self;
@@ -134,7 +144,7 @@ static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
     
     UIView<JTCalendarWeek> *weekView;
     if ([cell viewWithTag:6526] == nil) {
-        NSLog(@"creating new weekview");
+        //NSLog(@"creating new weekview");
         weekView = [calendarManager.delegateManager buildWeekView];
         [weekView setManager:calendarManager];
         weekView.tag = 6526;
@@ -143,7 +153,7 @@ static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
         [cell.contentView addSubview:weekView];
         
     } else {
-        NSLog(@"old weekview");
+        //NSLog(@"old weekview");
         weekView = (UIView<JTCalendarWeek>*)[cell viewWithTag:6526];
         [weekView setStartDate:[combinationDates objectAtIndex:indexPath.row] updateAnotherMonth:NO monthDate:fixedPointDate];
     }
@@ -273,11 +283,6 @@ static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
 {
     _dateSelected = dayView.date;
     
-//    UIView *derp = [UIView new];
-//    derp.frame = CGRectMake(0.0f, 0.0f, 20.0f, 20.0f);
-//    derp.backgroundColor = [UIColor redColor];
-//    
-//    [dayView addSubview:derp];
     
     // Animation for the circleView
     dayView.circleView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.1, 0.1);
@@ -287,8 +292,6 @@ static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
                     animations:^{
                         dayView.circleView.hidden = NO;
                         dayView.circleView.transform = CGAffineTransformIdentity;
-//                        [calendarManager reload];
-//                        [tableView reloadData];
                     } completion:^(BOOL finished){
                         NSLog(@"Done!");
                         //[calendarManager reload];
@@ -308,10 +311,39 @@ static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
 }
 
 - (UIView<JTCalendarDay> *)calendarBuildDayView:(JTCalendarManager *)calendar {
-    //JTCalendarFirstDayOfTheMonthView *jt =[JTCalendarFirstDayOfTheMonthView new];
-    NSLog(@"overriding JTCalendarDay building...");
-    
     return [JTCalendarFirstDayOfTheMonthView new];
+}
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    NSLog(@"scrollViewWillBeginDragging");
+    [UIView transitionWithView:monthOverlay
+                      duration:0.2
+                       options:UIViewAnimationOptionCurveEaseOut
+                    animations:^{
+                        [self.view addSubview:monthOverlay];
+                        monthOverlay.alpha = 1.0f;
+                        self.tableView.alpha = 0.5f;
+                    }
+                    completion:nil];
+    
+    
+    
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    NSLog(@"scrollViewDidEndDecelerating");
+    [UIView transitionWithView:monthOverlay
+                      duration:0.2
+                       options:UIViewAnimationOptionCurveEaseOut
+                    animations:^{
+                        monthOverlay.alpha = 0.0f;
+                        self.tableView.alpha = 1.0f;
+                    }
+                    completion:^(BOOL finished){
+                        [monthOverlay removeFromSuperview];
+                    }];
+    
+    
 }
 
 @end

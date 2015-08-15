@@ -159,11 +159,10 @@
 
 - (void)reload
 {
-    NSLog(@"reload reload");
     static NSDateFormatter *dateFormatter = nil;
     if(!dateFormatter){
         dateFormatter = [_manager.dateHelper createDateFormatter];
-        [dateFormatter setDateFormat:@"dd"];
+        [dateFormatter setDateFormat:@"d"];
     }
 
     _textLabel.text = [dateFormatter stringFromDate:_date];
