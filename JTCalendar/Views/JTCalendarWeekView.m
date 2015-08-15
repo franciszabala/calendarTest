@@ -97,7 +97,7 @@
             UIView<JTCalendarDay> *dayView = [_manager.delegateManager buildDayView];
             [_daysViews addObject:dayView];
             [self addSubview:dayView];
-            
+
             dayView.manager = _manager;
         }
         
@@ -125,27 +125,6 @@
     for(UIView *dayView in _daysViews){
         dayView.frame = CGRectMake(x, 0, dayWidth, dayHeight);
         x += dayWidth;
-    }
-   
-    if (_manager.settings.isResizeAutomatic) {
-//        CGFloat x = 0;
-//        CGFloat dayWidth = self.frame.size.width / NUMBER_OF_DAY_BY_WEEK;
-//        CGFloat dayHeight = self.frame.size.height;
-//    
-//        for(UIView *dayView in _daysViews){
-//            dayView.frame = CGRectMake(x, 0, dayWidth, dayHeight);
-//            x += dayWidth;
-//        }
-    } else {
-//        CGFloat x = 90;
-//        CGFloat dayWidth = self.frame.size.width / NUMBER_OF_DAY_BY_WEEK;
-//        CGFloat dayHeight = self.frame.size.height;
-//        
-//        for(UIView *dayView in _daysViews){
-//            dayView.frame = CGRectMake(x, 0, dayWidth, dayHeight);
-//            x += dayWidth;
-//        }
-
     }
 }
 

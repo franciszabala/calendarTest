@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		C6281FEF1B7C3D7800B24284 /* JTTableCalendarViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C6281FED1B7C3D7800B24284 /* JTTableCalendarViewController.m */; };
 		C6281FF01B7C3D7800B24284 /* JTTableCalendarViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C6281FEE1B7C3D7800B24284 /* JTTableCalendarViewController.xib */; };
+		C636ADDA1B7DDA9500B160AC /* JTWeekViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C636ADD91B7DDA9500B160AC /* JTWeekViewCell.m */; };
+		C636ADDD1B7DFD1900B160AC /* JTCalendarFirstDayOfTheMonthView.m in Sources */ = {isa = PBXBuildFile; fileRef = C636ADDC1B7DFD1900B160AC /* JTCalendarFirstDayOfTheMonthView.m */; };
 		C6439BC81B75C8B70092EFAA /* JTCalendarManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C6439BA81B75C8B70092EFAA /* JTCalendarManager.m */; };
 		C6439BC91B75C8B70092EFAA /* JTCalendarSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C6439BAA1B75C8B70092EFAA /* JTCalendarSettings.m */; };
 		C6439BCA1B75C8B70092EFAA /* JTDateHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C6439BAC1B75C8B70092EFAA /* JTDateHelper.m */; };
@@ -45,6 +47,10 @@
 		C6281FEC1B7C3D7800B24284 /* JTTableCalendarViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JTTableCalendarViewController.h; sourceTree = "<group>"; };
 		C6281FED1B7C3D7800B24284 /* JTTableCalendarViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JTTableCalendarViewController.m; sourceTree = "<group>"; };
 		C6281FEE1B7C3D7800B24284 /* JTTableCalendarViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = JTTableCalendarViewController.xib; sourceTree = "<group>"; };
+		C636ADD81B7DDA9500B160AC /* JTWeekViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JTWeekViewCell.h; sourceTree = "<group>"; };
+		C636ADD91B7DDA9500B160AC /* JTWeekViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JTWeekViewCell.m; sourceTree = "<group>"; };
+		C636ADDB1B7DFD1900B160AC /* JTCalendarFirstDayOfTheMonthView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JTCalendarFirstDayOfTheMonthView.h; sourceTree = "<group>"; };
+		C636ADDC1B7DFD1900B160AC /* JTCalendarFirstDayOfTheMonthView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JTCalendarFirstDayOfTheMonthView.m; sourceTree = "<group>"; };
 		C6439BA51B75C8B70092EFAA /* JTCalendar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JTCalendar.h; sourceTree = "<group>"; };
 		C6439BA61B75C8B70092EFAA /* JTCalendarDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JTCalendarDelegate.h; sourceTree = "<group>"; };
 		C6439BA71B75C8B70092EFAA /* JTCalendarManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JTCalendarManager.h; sourceTree = "<group>"; };
@@ -171,6 +177,10 @@
 				C6439BC51B75C8B70092EFAA /* JTHorizontalCalendarView.m */,
 				C6439BC61B75C8B70092EFAA /* JTVerticalCalendarView.h */,
 				C6439BC71B75C8B70092EFAA /* JTVerticalCalendarView.m */,
+				C636ADD81B7DDA9500B160AC /* JTWeekViewCell.h */,
+				C636ADD91B7DDA9500B160AC /* JTWeekViewCell.m */,
+				C636ADDB1B7DFD1900B160AC /* JTCalendarFirstDayOfTheMonthView.h */,
+				C636ADDC1B7DFD1900B160AC /* JTCalendarFirstDayOfTheMonthView.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -345,10 +355,12 @@
 				C6EB33AC1B6CE42300D8F5EC /* ViewController.m in Sources */,
 				C6439BCA1B75C8B70092EFAA /* JTDateHelper.m in Sources */,
 				C6EB33A91B6CE42300D8F5EC /* AppDelegate.m in Sources */,
+				C636ADDD1B7DFD1900B160AC /* JTCalendarFirstDayOfTheMonthView.m in Sources */,
 				C6439BCC1B75C8B70092EFAA /* JTCalendarScrollManager.m in Sources */,
 				C6439BC81B75C8B70092EFAA /* JTCalendarManager.m in Sources */,
 				C6439BD21B75C8B70092EFAA /* JTHorizontalCalendarView.m in Sources */,
 				C6281FEF1B7C3D7800B24284 /* JTTableCalendarViewController.m in Sources */,
+				C636ADDA1B7DDA9500B160AC /* JTWeekViewCell.m in Sources */,
 				C6439BCD1B75C8B70092EFAA /* JTCalendarDayView.m in Sources */,
 				C6439BD11B75C8B70092EFAA /* JTCalendarWeekView.m in Sources */,
 				C6439BD01B75C8B70092EFAA /* JTCalendarWeekDayView.m in Sources */,

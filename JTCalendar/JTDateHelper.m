@@ -87,7 +87,6 @@
     componentsNewDate.month = componentsCurrentDate.month;
     componentsNewDate.weekOfMonth = 1;
     componentsNewDate.day = 1;
-    
     return [self.calendar dateFromComponents:componentsNewDate];
 }
 
@@ -146,7 +145,6 @@
 {
     NSDateComponents *componentsA = [self.calendar components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay fromDate:dateA];
     NSDateComponents *componentsB = [self.calendar components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay fromDate:dateB];
-    
     return componentsA.year == componentsB.year && componentsA.month == componentsB.month && componentsA.day == componentsB.day;
 }
 
@@ -176,6 +174,13 @@
     
     return NO;
 }
+
+- (BOOL) isFirstDayOfTheMonth:(NSDate *) date
+{
+    NSDate *firstDayOfTheMonth = [self firstDayOfMonth:date];
+    return [self date:firstDayOfTheMonth isTheSameDayThan:date];
+}
+
 
 @end
 

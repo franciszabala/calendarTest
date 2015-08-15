@@ -31,4 +31,5 @@
 - (BOOL)date:(NSDate *)dateA isEqualOrAfter:(NSDate *)dateB;
 - (BOOL)date:(NSDate *)date isEqualOrAfter:(NSDate *)startDate andEqualOrBefore:(NSDate *)endDate;
 
+- (BOOL)isFirstDayOfTheMonth:(NSDate *) date;
 @end

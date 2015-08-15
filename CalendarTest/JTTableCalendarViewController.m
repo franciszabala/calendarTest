@@ -8,6 +8,10 @@
 
 #import "JTTableCalendarViewController.h"
 #import "JTCalendarWeek.h"
+#import "JTWeekViewCell.h"
+#import "JTCalendarFirstDayOfTheMonthView.h"
+
+
 
 @interface JTTableCalendarViewController () {
     NSArray *tableViewItems;
@@ -21,15 +25,21 @@
     
     NSMutableArray *combinationDates;
     
-    UITableView *tableView;
+    
     
     CGRect topFrameOpened;
     CGRect topFrameClosed;
+    
+    NSDate *_dateSelected;
 }
 @end
 
 
 @implementation JTTableCalendarViewController
+
+static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
+
+
 @synthesize calendarManager;
 
 
@@ -57,19 +67,21 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [self.tableView registerClass:[JTWeekViewCell class] forCellReuseIdentifier:WeekViewCellIdentifier];
+    
     CGFloat origY =65.0f+40.0f;
     //CGFloat origBottom =origY + 150.0f;
     topFrameOpened = CGRectMake(0.0f, origY, 320.0f, 220.0f);
     topFrameClosed = CGRectMake(0.0f, origY, 320.0f, 100.0f);
     self.automaticallyAdjustsScrollViewInsets = NO;
-    tableView = [[UITableView alloc] initWithFrame:topFrameOpened style:UITableViewStylePlain];
+    self.tableView = [[UITableView alloc] initWithFrame:topFrameOpened style:UITableViewStylePlain];
     
     fixedPointDate = [NSDate date];
     dayComponent = [[NSDateComponents alloc] init];
     theCalendar = [NSCalendar currentCalendar];
     
-    tableView.delegate = self;
-    tableView.dataSource = self;
+    self.tableView.delegate = self;
+    self.tableView.dataSource = self;
     
     //[self createTableViewItems];
     
@@ -87,111 +99,10 @@
     [combinationDates addObjectsFromArray:pastDates];
     [combinationDates addObjectsFromArray:futureDates];
     
-    tableView.frame = CGRectMake(0.0f, 85.0f, 220.0f, 80.0f);
-    NSLog(@"%@", NSStringFromCGRect(tableView.frame));
-    tableView.tag = 6090;
-    [self.view addSubview:tableView];
-    //tableView.hidden = YES;
-    
-    //
-    //self.automaticallyAdjustsScrollViewInsets = NO;
-    //
-    //
-    //
-    //    top = [UIView new];
-    //    top.backgroundColor = [UIColor blueColor];
-    //
-    //    bottom = [UIView new];
-    //    bottom.backgroundColor = [UIColor greenColor];
-    //
-    //
-    //    top.frame = topFrameOpened;
-    //    bottom.frame = bottomFrameClosed;
-    //
-    //    topTableView = [[UITableView alloc] initWithFrame:topFrameOpened style:UITableViewStylePlain];
-    //    bottomTableView = [[UITableView alloc] initWithFrame:bottomFrameClosed style:UITableViewStylePlain];
-    //    topTableView.backgroundColor = [UIColor blueColor];
-    //    bottomTableView.backgroundColor = [UIColor greenColor];
-    //
-    //    topTableView.tag = 69;
-    //    bottomTableView.tag = 42;
-    //
-    //    topTableView.delegate = self;
-    //    topTableView.dataSource = self;
-    //
-    //    bottomTableView.delegate = self;
-    //    bottomTableView.dataSource = self;
-    //
-    //    bottomTableView.backgroundColor = [UIColor cyanColor];
-    
-    /*
-     calendarManager = [JTCalendarManager new];
-     calendarManager.delegate = self;
-     
-     
-     // Generate random events sort by date using a dateformatter for the demonstration
-     [self createRandomEvents];
-     
-     // Create a min and max date for limit the calendar, optional
-     [self createMinAndMaxDate];
-     
-     
-     calendarMenuView = [JTCalendarMenuView new];
-     calendarContentView = [JTHorizontalCalendarView new];
-     calendarContentView.delegate = self;
-     calendarContentView.backgroundColor = [UIColor yellowColor];
-     calendarContentView.tag = 69;
-     
-     calendarContentView.frame = topFrameOpened;
-     
-     [calendarManager setMenuView:calendarMenuView];
-     [calendarManager setContentView:calendarContentView];
-     [calendarManager setDate:_todayDate];
-     
-     [self.view addSubview:calendarContentView];
-     [self.view addSubview:bottomTableView];
-     */
-    
-    
-    //    calendarMenuView = [JTCalendarMenuView new];
-    //    calendarMenuView.frame = CGRectMake(0.0f, 65.0f, 320.0f, 40.0f);
-    //
-    //    weekDayView = [JTCalendarWeekDayView new];
-    //    weekDayView.frame = CGRectMake(0.0f, 65.0f, 320.0f, 20.0f);
-    //
-    //    calendarContentView = [JTVerticalCalendarView new];
-    //    calendarContentView.delegate = self;
-    //    calendarContentView.backgroundColor = [UIColor yellowColor];
-    //    calendarContentView.tag = 69;
-    //
-    //
-    //    calendarContentView.frame = topFrameOpened;
-    //
-    //    calendarManager = [JTCalendarManager new];
-    //    calendarManager.delegate = self;
-    //
-    //
-    //    calendarManager.settings.pageViewHaveWeekDaysView = NO;
-    //    calendarManager.settings.pageViewNumberOfWeeks = 0; // Automatic
-    //    calendarManager.settings.isResizeAutomatic = NO;
-    //
-    //    weekDayView.manager = calendarManager;
-    //[weekDayView reload];
-    
-    // Generate random events sort by date using a dateformatter for the demonstration
-    //[self createRandomEvents];
-    
-    //    [calendarManager setMenuView:calendarMenuView];
-    //    [calendarManager setContentView:calendarContentView];
-    //    [calendarManager setDate:[NSDate date]];
-    //    //calendarMenuView.scrollView.scrollEnabled = NO;
-    //    calendarMenuView.scrollView.scrollEnabled = NO;
-    //    calendarMenuView.backgroundColor = [UIColor redColor];
-    //
-    //    [self.view addSubview:calendarMenuView];
-    //    [self.view addSubview:calendarContentView];
-    //    [self.view addSubview:bottomTableView];
-    //[self.view addSubview:weekDayView];
+    self.tableView.frame = CGRectMake(0.0f, 65.0f, 320.0f, 480.0f);
+    self.tableView.tag = 6090;
+    [self.view addSubview:self.tableView];
+
     
 }
 
@@ -212,93 +123,56 @@
 }
 
 // the cell will be returned to the tableView
-- (UITableViewCell *)tableView:(UITableView *)theTableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
-    NSLog(@"theTableView.tag: %d", theTableView.tag);
-    //static NSString *cellTopIdentifier = @"HistoryCell";
-    static NSString *cellIdentifier = @"Derp";
-    //    if (theTableView.tag == 42) {
-    //
-    //        UITableViewCell *cell = (UITableViewCell *)[theTableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    //        if (cell == nil) {
-    //            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellTopIdentifier];
-    //        }
-    //        // Just want to test, so I hardcode the data
-    //        int count = [tableViewItems count] - 1;
-    //        cell.textLabel.text = [tableViewItems objectAtIndex:count - indexPath.row];
-    //
-    //        return cell;
-    //
-    //    } else {
-    // Similar to UITableViewCell, but
+    UITableViewCell *cell = (UITableViewCell *)[tableView dequeueReusableCellWithIdentifier:WeekViewCellIdentifier];
     
-    
-    
-    
-    UITableViewCell *cell = (UITableViewCell *)[theTableView dequeueReusableCellWithIdentifier:cellIdentifier];
     if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:WeekViewCellIdentifier];
     }
+    
     UIView<JTCalendarWeek> *weekView;
     if ([cell viewWithTag:6526] == nil) {
+        NSLog(@"creating new weekview");
         weekView = [calendarManager.delegateManager buildWeekView];
         [weekView setManager:calendarManager];
         weekView.tag = 6526;
-        weekView.backgroundColor = [UIColor blueColor];
-        weekView.frame = CGRectMake(0.0f, 0.0f, 320.0f, 44.0f);
+        weekView.frame = cell.frame;
         [weekView setStartDate:[combinationDates objectAtIndex:indexPath.row] updateAnotherMonth:NO monthDate:fixedPointDate];
         [cell.contentView addSubview:weekView];
-        //NSLog(@"creating new weekview");
+        
     } else {
+        NSLog(@"old weekview");
         weekView = (UIView<JTCalendarWeek>*)[cell viewWithTag:6526];
         [weekView setStartDate:[combinationDates objectAtIndex:indexPath.row] updateAnotherMonth:NO monthDate:fixedPointDate];
-        //NSLog(@"old weekview");
     }
     
+    //Doesn't work
+    /*
+    JTWeekViewCell *cell = (JTWeekViewCell *)[tableView dequeueReusableCellWithIdentifier:WeekViewCellIdentifier];
     
-    //    NSDate* weekDate = [calendarManager.dateHelper firstWeekDayOfWeek:[NSDate date]];
-    //
-    //    UIView<JTCalendarWeek> *weekView = (UIView<JTCalendarWeek>*) [cell viewWithTag:6526];
-    //
-    //
-    //        weekView = [calendarManager.delegateManager buildWeekView];
-    //        [weekView setManager:calendarManager];
-    //        weekView.tag = 6526;
-    //        weekView.backgroundColor = [UIColor blueColor];
-    //        weekView.frame = CGRectMake(0.0f, 0.0f, 320.0f, 44.0f);
-    //
-    //
-    //
-    //    dayComponent.day = indexPath.row*7;
-    //    NSDate *nextDate = [theCalendar dateByAddingComponents:dayComponent toDate:weekDate options:0];
-    //    //weekDate = [_manager.dateHelper firstWeekDayOfMonth:_date];
-    //
-    //    [weekView setStartDate:nextDate updateAnotherMonth:NO monthDate:[NSDate date]];
-    //
-    //if (weekView != nil) {
-    //
-    // } else {
-    //    [cell.contentView addSubview:weekView];
-    // }
+    if (cell == nil) {
+        cell = [[JTWeekViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:WeekViewCellIdentifier];
+    }
+
+    UIView<JTCalendarWeek> *weekView;
+    weekView = [calendarManager.delegateManager buildWeekView];
+            [weekView setManager:calendarManager];
+    [weekView setStartDate:[combinationDates objectAtIndex:indexPath.row] updateAnotherMonth:NO monthDate:fixedPointDate];
     
+    cell.weekView = weekView;
+    */
     
-    //weekView.manager = calendarManager;
-    //}
-    //    dayComponent.day = indexPath.row;
-    //    NSDate *dateMe = [theCalendar dateByAddingComponents:dayComponent toDate: [NSDate date] options:0];
-    //
-    //    cell.textLabel.text = [NSDateFormatter localizedStringFromDate:dateMe
-    //                                                               dateStyle:NSDateFormatterShortStyle
-    //                                                               timeStyle:NSDateFormatterShortStyle];
-    
-    //    NSDate *dateIndex = [combinationDates objectAtIndex:indexPath.row];
-    //        cell.textLabel.text = [NSDateFormatter localizedStringFromDate:dateIndex
-    //                                                                   dateStyle:NSDateFormatterShortStyle
-    //                                                                   timeStyle:NSDateFormatterShortStyle];
-    
+    //Sanity check
+    /*
+     UIView *derp = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 20.0f, 20.0f)];
+    derp.backgroundColor = [UIColor blueColor];
+    NSLog(@"");
+    [cell addSubview:derp];
+     */
     return cell;
-    // }
+    
 }
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -311,175 +185,7 @@
     tableViewItems = @[@"Mercedes-Benz", @"BMW", @"Porsche",
                        @"Opel", @"Volkswagen", @"Audi"];
 }
-/*
- #pragma mark - Navigation
- 
- // In a storyboard-based application, you will often want to do a little preparation before navigation
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
- // Get the new view controller using [segue destinationViewController].
- // Pass the selected object to the new view controller.
- }
- */
 
-- (void) createFutureDates {
-    futureDates = [NSMutableArray new];
-    
-    
-    for (int i = 0; i < 52; i++) {
-        
-        //dayComponent.day = (i+1)*7;
-        dayComponent.day = i;
-        NSDate *nextDate = [theCalendar dateByAddingComponents:dayComponent toDate:fixedPointDate options:0];
-        [futureDates addObject:nextDate];
-        //        UIView<JTCalendarWeek> *weekView = [calendarManager.delegateManager buildWeekView];
-        //        [weekView setManager:calendarManager];
-        //        weekView.backgroundColor = [UIColor blueColor];
-        //        weekView.frame = CGRectMake(0.0f, 0.0f, 320.0f, 44.0f);
-        //
-        //        dayComponent.day = i*7;
-        //        NSDate *nextDate = [theCalendar dateByAddingComponents:dayComponent toDate:weekDate options:0];
-        //        //weekDate = [_manager.dateHelper firstWeekDayOfMonth:_date];
-        //
-        //        [weekView setStartDate:nextDate updateAnotherMonth:NO monthDate:[NSDate date]];
-        //        //[futureDates addObject:weekView];
-        //        //NSLog(@"nextDate: %@ ...", nextDate);
-    }
-    
-    
-    
-    
-    //    /*
-    //
-    //     UIView<JTCalendarWeek> *weekView = [calendarManager.delegateManager buildWeekView];
-    //     //        [_weeksViews addObject:weekView];
-    //     //        [self addSubview:weekView];
-    //     [weekView setManager:calendarManager];
-    //     [weekView setStartDate:[NSDate date] updateAnotherMonth:NO monthDate:[NSDate date]];
-    //     */
-    //
-    //
-    //
-    //
-    //    NSDate* weekDate = [calendarManager.dateHelper firstWeekDayOfWeek:[NSDate date]];
-    //    for (int i = 0; i < 24; i++) {
-    //        UIView<JTCalendarWeek> *weekView = [calendarManager.delegateManager buildWeekView];
-    //        [weekView setManager:calendarManager];
-    //        weekView.backgroundColor = [UIColor blueColor];
-    //        weekView.frame = CGRectMake(0.0f, 0.0f, 320.0f, 44.0f);
-    //
-    //        dayComponent.day = i*7;
-    //        NSDate *nextDate = [theCalendar dateByAddingComponents:dayComponent toDate:weekDate options:0];
-    //        //weekDate = [_manager.dateHelper firstWeekDayOfMonth:_date];
-    //
-    //        [weekView setStartDate:nextDate updateAnotherMonth:NO monthDate:[NSDate date]];
-    //        //[futureDates addObject:weekView];
-    //        //NSLog(@"nextDate: %@ ...", nextDate);
-    //    }
-    
-}
-
-- (void) createPastDates {
-    pastDates = [NSMutableArray new];
-    
-    for (int i = 52; i >= 0; i--) {
-        
-        //dayComponent.day = ((i+1)*7) * (-1);
-        dayComponent.day = i * -1;
-        NSDate *nextDate = [theCalendar dateByAddingComponents:dayComponent toDate:fixedPointDate options:0];
-        [pastDates addObject:nextDate];
-        //        UIView<JTCalendarWeek> *weekView = [calendarManager.delegateManager buildWeekView];
-        //        [weekView setManager:calendarManager];
-        //        weekView.backgroundColor = [UIColor blueColor];
-        //        weekView.frame = CGRectMake(0.0f, 0.0f, 320.0f, 44.0f);
-        //
-        //        dayComponent.day = i*7;
-        //        NSDate *nextDate = [theCalendar dateByAddingComponents:dayComponent toDate:weekDate options:0];
-        //        //weekDate = [_manager.dateHelper firstWeekDayOfMonth:_date];
-        //
-        //        [weekView setStartDate:nextDate updateAnotherMonth:NO monthDate:[NSDate date]];
-        //        //[futureDates addObject:weekView];
-        //        //NSLog(@"nextDate: %@ ...", nextDate);
-    }
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    NSIndexPath *scrollIndexPath = [NSIndexPath indexPathForRow:(26) inSection:0];
-    [tableView scrollToRowAtIndexPath:scrollIndexPath atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
-}
-
-
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-    
-    //    NSInteger currentOffset = scrollView.contentOffset.y;
-    //    NSInteger maximumOffset = scrollView.contentSize.height - (scrollView.frame.size.height * 2.5f );
-    //
-    //    if (maximumOffset - currentOffset <= 0) {
-    //         NSLog(@"load future");
-    //    } else if (scrollView.contentOffset.y < scrollView.frame.size.height * 2.5f ) {
-    //        NSLog(@"load previous");
-    //    }
-    
-    //    NSIndexPath *firstVisibleIndexPath = [[self.tableView indexPathsForVisibleRows] objectAtIndex:0];
-    //    NSLog(@"first visible cell's section: %i, row: %i", firstVisibleIndexPath.section, firstVisibleIndexPath.row);
-    //
-    //    if (firstVisibleIndexPath.row < 34) {
-    //        [self addPastRemoveFuture];
-    //    } else if (firstVisibleIndexPath.row > 72){
-    //        [self addFutureRemovePast];
-    //    }
-}
-
-- (void) addPastRemoveFuture {
-    NSLog(@"add new past dates");
-    NSLog(@"remove future dates");
-    
-    //    movingPointDate = [pastDates objectAtIndex:(0)];
-    //    [self createPastDatesWithReferencePoint:movingPointDate];
-    //    [combinationDates addObjectsFromArray:pastDates];
-    //    //[combinationDates removeObjectsInArray:futureDates];
-    //
-    //    [tableView reloadData];
-    
-    
-}
-- (void) addFutureRemovePast {
-    NSLog(@"add new future dates");
-    NSLog(@"remove past dates");
-    
-    //get latest future
-    movingPointDate = [futureDates objectAtIndex:([futureDates count] - 1)];
-    [self createFutureDatesWithReferencePoint:movingPointDate];
-    [combinationDates addObjectsFromArray:futureDates];
-    //[combinationDates removeObjectsInRange:NSMakeRange(0, 52)];
-    //[combinationDates removeObjectsInArray:pastDates];
-    [tableView reloadData];
-    
-}
-
-
-
-//-(void)scrollViewWillEndDragging:(UIScrollView *)scrollView
-//                    withVelocity:(CGPoint)velocity
-//             targetContentOffset:(inout CGPoint *)targetContentOffset{
-//    NSIndexPath *firstVisibleIndexPath = [[self.tableView indexPathsForVisibleRows] objectAtIndex:0];
-//
-//    if (velocity.y > 0){
-//        NSLog(@"up");
-//        if (firstVisibleIndexPath.row > ([combinationDates count] - 72)){
-//            //[self addFutureRemovePast];
-//        }
-//
-//    }
-//    if (velocity.y < 0){
-//        NSLog(@"down");
-//        if (firstVisibleIndexPath.row < 34) {
-//            //[self addPastRemoveFuture];
-//        }
-//
-//    }
-//
-//}
 
 - (void) createPastDatesWithReferencePoint:(NSDate*) dateReference{
     
@@ -504,11 +210,108 @@
     }
 }
 
-//- (void) scrollViewDidScroll:(UIScrollView *)scrollView {
-//    //scrollView.contentOffset.y increases as you go down
-//    //scrollView.contentSize.height never changes
-//    NSLog(@"scrollView.contentOffset.y: %f", scrollView.contentOffset.y);
-//    NSLog(@"scrollView.contentSize.height: %f", scrollView.contentSize.height);
-//}
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    NSIndexPath *scrollIndexPath = [NSIndexPath indexPathForRow:(26) inSection:0];
+    [self.tableView scrollToRowAtIndexPath:scrollIndexPath atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
+}
+
+
+#pragma mark - CalendarManager delegate
+
+// Exemple of implementation of prepareDayView method
+// Used to customize the appearance of dayView
+- (void)calendar:(JTCalendarManager *)calendar prepareDayView:(JTCalendarFirstDayOfTheMonthView *)dayView
+{
+    
+    // Today
+    if([calendarManager.dateHelper date:[NSDate date] isTheSameDayThan:dayView.date]){
+        dayView.circleView.hidden = NO;
+        dayView.firstMonthDayView.hidden = YES;
+        dayView.circleView.backgroundColor = [UIColor blueColor];
+        dayView.dotView.backgroundColor = [UIColor whiteColor];
+        dayView.textLabel.textColor = [UIColor whiteColor];
+    }
+    // Selected date
+    else if(_dateSelected && [calendarManager.dateHelper date:_dateSelected isTheSameDayThan:dayView.date]){
+        dayView.circleView.hidden = NO;
+        dayView.firstMonthDayView.hidden = YES;
+        dayView.circleView.backgroundColor = [UIColor redColor];
+        dayView.dotView.backgroundColor = [UIColor whiteColor];
+        dayView.textLabel.textColor = [UIColor whiteColor];
+        
+    }
+    // Other month
+    /*
+    else if(![calendarManager.dateHelper date:calendarContentView.date isTheSameMonthThan:dayView.date]){
+        dayView.circleView.hidden = YES;
+        dayView.dotView.backgroundColor = [UIColor redColor];
+        dayView.textLabel.textColor = [UIColor lightGrayColor];
+    }
+     */
+    // Another day of the current month
+    else{
+        if ([calendarManager.dateHelper isFirstDayOfTheMonth:dayView.date]) {
+            dayView.firstMonthDayView.hidden = NO;
+        } else {
+            dayView.firstMonthDayView.hidden = YES;
+        }
+        dayView.circleView.hidden = YES;
+        dayView.dotView.backgroundColor = [UIColor redColor];
+        dayView.textLabel.textColor = [UIColor blackColor];
+    }
+    
+    //    if([self haveEventForDay:dayView.date]){
+    //        dayView.dotView.hidden = NO;
+    //    }
+    //    else{
+    //        dayView.dotView.hidden = YES;
+    //    }
+}
+
+- (void)calendar:(JTCalendarManager *)calendar didTouchDayView:(JTCalendarDayView *)dayView
+{
+    _dateSelected = dayView.date;
+    
+//    UIView *derp = [UIView new];
+//    derp.frame = CGRectMake(0.0f, 0.0f, 20.0f, 20.0f);
+//    derp.backgroundColor = [UIColor redColor];
+//    
+//    [dayView addSubview:derp];
+    
+    // Animation for the circleView
+    dayView.circleView.transform = CGAffineTransformScale(CGAffineTransformIdentity, 0.1, 0.1);
+    [UIView transitionWithView:dayView
+                      duration:0.0
+                       options:0
+                    animations:^{
+                        dayView.circleView.hidden = NO;
+                        dayView.circleView.transform = CGAffineTransformIdentity;
+//                        [calendarManager reload];
+//                        [tableView reloadData];
+                    } completion:^(BOOL finished){
+                        NSLog(@"Done!");
+                        //[calendarManager reload];
+                        [self.tableView reloadData];
+                   }];
+    // Load the previous or next page if touch a day from another month
+    /*
+    if(![calendarManager.dateHelper date:calendarContentView.date isTheSameMonthThan:dayView.date]){
+        if([calendarContentView.date compare:dayView.date] == NSOrderedAscending){
+            [calendarContentView loadNextPageWithAnimation];
+        }
+        else{
+            [calendarContentView loadPreviousPageWithAnimation];
+        }
+    }
+     */
+}
+
+- (UIView<JTCalendarDay> *)calendarBuildDayView:(JTCalendarManager *)calendar {
+    //JTCalendarFirstDayOfTheMonthView *jt =[JTCalendarFirstDayOfTheMonthView new];
+    NSLog(@"overriding JTCalendarDay building...");
+    
+    return [JTCalendarFirstDayOfTheMonthView new];
+}
 
 @end

@@ -13,5 +13,5 @@
 
 
 @property (strong, nonatomic) JTCalendarManager *calendarManager;
-
+@property (strong, nonatomic) UITableView *tableView;
 @end
