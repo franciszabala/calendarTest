@@ -25,6 +25,8 @@
     
     NSMutableArray *combinationDates;
     
+    NSMutableArray *monthOverlayArray;
+    
     
     
     CGRect topFrameOpened;
@@ -33,6 +35,8 @@
     NSDate *_dateSelected;
     
     UIView *monthOverlay;
+    
+    UITableView *monthTableOverlay;
 }
 @end
 
@@ -40,6 +44,7 @@
 @implementation JTTableCalendarViewController
 
 static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
+static NSString *MonthOverlayCellIdentifier = @"MonthOverlayCellIdentifier";
 
 
 @synthesize calendarManager;
@@ -71,7 +76,18 @@ static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
     [super viewDidLoad];
     [self.tableView registerClass:[JTWeekViewCell class] forCellReuseIdentifier:WeekViewCellIdentifier];
     
-    CGFloat origY =65.0f+40.0f;
+    
+    monthTableOverlay = [UITableView new];
+    monthTableOverlay.delegate = self;
+    monthTableOverlay.dataSource = self;
+    monthTableOverlay.frame = CGRectMake(0.0f, 65.0f, 320.0f, 480.0f);
+    
+    monthTableOverlay.alpha = 0.0f;
+    monthTableOverlay.tag = 6091;
+    [self.view addSubview:monthTableOverlay];
+    
+    
+    CGFloat origY = 65.0f+40.0f;
     //CGFloat origBottom =origY + 150.0f;
     topFrameOpened = CGRectMake(0.0f, origY, 320.0f, 220.0f);
     topFrameClosed = CGRectMake(0.0f, origY, 320.0f, 100.0f);
@@ -94,13 +110,12 @@ static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
     
     monthOverlay.backgroundColor = monthOverlayColor;
     monthOverlay.userInteractionEnabled = NO;
-    //monthOverlay.opaque = NO;
    
     
     calendarManager = [JTCalendarManager new];
     calendarManager.delegate = self;
     [calendarManager setDate:fixedPointDate];
-    
+     monthOverlayArray = [NSMutableArray new];
     [self createFutureDatesWithReferencePoint:[calendarManager.dateHelper firstWeekDayOfWeek:fixedPointDate]];
     [self createPastDatesWithReferencePoint:[calendarManager.dateHelper firstWeekDayOfWeek:fixedPointDate]];
     
@@ -108,10 +123,11 @@ static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
     combinationDates = [NSMutableArray new];
     [combinationDates addObjectsFromArray:pastDates];
     [combinationDates addObjectsFromArray:futureDates];
-    
+   
     self.tableView.frame = CGRectMake(0.0f, 65.0f, 320.0f, 480.0f);
     self.tableView.tag = 6090;
     [self.view addSubview:self.tableView];
+    
 
     
 }
@@ -125,16 +141,20 @@ static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
 }
 
 // number of row in the section, I assume there is only 1 row
-- (NSInteger)tableView:(UITableView *)theTableView numberOfRowsInSection:(NSInteger)section
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     //return [futureDates count];
-    
-    return [combinationDates count]; //roughly 52 weeks in a year
+    if (tableView.tag == 6090) {
+        return [combinationDates count]; //roughly 52 weeks in a year
+    } else {
+        return [combinationDates count];
+    }
 }
 
 // the cell will be returned to the tableView
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    if (tableView.tag == 6090) {
     
     UITableViewCell *cell = (UITableViewCell *)[tableView dequeueReusableCellWithIdentifier:WeekViewCellIdentifier];
     
@@ -181,7 +201,18 @@ static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
     NSLog(@"");
     [cell addSubview:derp];
      */
-    return cell;
+        return cell;
+    
+    } else {
+        UITableViewCell *cell = (UITableViewCell *)[tableView dequeueReusableCellWithIdentifier:WeekViewCellIdentifier];
+        
+        if (cell == nil) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:MonthOverlayCellIdentifier];
+        }
+        
+        cell.textLabel.text = [monthOverlayArray objectAtIndex:indexPath.row];
+        return cell;
+    }
     
 }
 - (void)didReceiveMemoryWarning {
@@ -205,7 +236,9 @@ static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
         //dayComponent.day = -1*i;
         NSDate *nextDate = [theCalendar dateByAddingComponents:dayComponent toDate:dateReference options:0];
         [pastDates addObject:nextDate];
+        [monthOverlayArray addObject:@"derp"];
     }
+    
 }
 
 
@@ -217,7 +250,9 @@ static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
         //dayComponent.day = 1*i;
         NSDate *nextDate = [theCalendar dateByAddingComponents:dayComponent toDate:dateReference options:0];
         [futureDates addObject:nextDate];
+        [monthOverlayArray addObject:@"future derp"];
     }
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -322,6 +357,7 @@ static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
                     animations:^{
                         [self.view addSubview:monthOverlay];
                         monthOverlay.alpha = 1.0f;
+                        monthTableOverlay.alpha = 1.0f;
                         self.tableView.alpha = 0.5f;
                     }
                     completion:nil];
@@ -337,6 +373,7 @@ static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
                        options:UIViewAnimationOptionCurveEaseOut
                     animations:^{
                         monthOverlay.alpha = 0.0f;
+                         monthTableOverlay.alpha = 0.0f;
                         self.tableView.alpha = 1.0f;
                     }
                     completion:^(BOOL finished){
@@ -344,6 +381,21 @@ static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
                     }];
     
     
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView;
+{
+//    UITableView *slaveTable = nil;
+//    
+//    if (self.table1 == scrollView) {
+//        slaveTable = self.table2;
+//    } else if (self.table2 == scrollView) {
+//        slaveTable = self.table1;
+//    }
+    if (scrollView.tag == 6090) {
+        NSLog(@"scrollViewDidScroll at 6090");
+        [monthTableOverlay setContentOffset:scrollView.contentOffset];
+    }
 }
 
 @end
