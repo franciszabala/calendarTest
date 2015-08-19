@@ -181,6 +181,21 @@
     return [self date:firstDayOfTheMonth isTheSameDayThan:date];
 }
 
+- (BOOL) isThirdWeekOfTheMonth:(NSDate *) date
+{
+//    NSDate *firstDayOfTheMonth = [self firstDayOfMonth:date];
+//    return [self date:firstDayOfTheMonth isTheSameDayThan:date];
+    
+    NSDateComponents *componentsCurrentDate = [self.calendar components:NSCalendarUnitYear|NSCalendarUnitMonth|NSCalendarUnitDay|NSCalendarUnitWeekday|NSCalendarUnitWeekOfMonth fromDate:date];
+    NSLog(@"componentsCurrentDate: %@", componentsCurrentDate);
+    if (componentsCurrentDate.weekOfMonth == 3) {
+        return true;
+    } else {
+        return false;
+    }
+
+}
+
 
 @end
 

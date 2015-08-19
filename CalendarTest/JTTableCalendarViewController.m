@@ -45,7 +45,7 @@
 
 static NSString *WeekViewCellIdentifier = @"WeekViewCellIdentifier";
 static NSString *MonthOverlayCellIdentifier = @"MonthOverlayCellIdentifier";
-
+static NSDateFormatter *monthFormatter = nil;
 
 @synthesize calendarManager;
 
@@ -76,6 +76,14 @@ static NSString *MonthOverlayCellIdentifier = @"MonthOverlayCellIdentifier";
     [super viewDidLoad];
     [self.tableView registerClass:[JTWeekViewCell class] forCellReuseIdentifier:WeekViewCellIdentifier];
     
+    calendarManager = [JTCalendarManager new];
+    calendarManager.delegate = self;
+    
+    monthFormatter = [NSDateFormatter new];
+    
+    monthFormatter.timeZone = calendarManager.dateHelper.calendar.timeZone;
+    monthFormatter.locale = calendarManager.dateHelper.calendar.locale;
+        [monthFormatter setDateFormat:@"MMMM"];
     
     monthTableOverlay = [UITableView new];
     monthTableOverlay.delegate = self;
@@ -112,13 +120,13 @@ static NSString *MonthOverlayCellIdentifier = @"MonthOverlayCellIdentifier";
     monthOverlay.userInteractionEnabled = NO;
    
     
-    calendarManager = [JTCalendarManager new];
-    calendarManager.delegate = self;
+
     [calendarManager setDate:fixedPointDate];
      monthOverlayArray = [NSMutableArray new];
-    [self createFutureDatesWithReferencePoint:[calendarManager.dateHelper firstWeekDayOfWeek:fixedPointDate]];
     [self createPastDatesWithReferencePoint:[calendarManager.dateHelper firstWeekDayOfWeek:fixedPointDate]];
+    [self createFutureDatesWithReferencePoint:[calendarManager.dateHelper firstWeekDayOfWeek:fixedPointDate]];
     
+    [self populateMonthOverlayArray];
     
     combinationDates = [NSMutableArray new];
     [combinationDates addObjectsFromArray:pastDates];
@@ -211,6 +219,7 @@ static NSString *MonthOverlayCellIdentifier = @"MonthOverlayCellIdentifier";
         }
         
         cell.textLabel.text = [monthOverlayArray objectAtIndex:indexPath.row];
+        cell.textLabel.textAlignment = NSTextAlignmentCenter;
         return cell;
     }
     
@@ -236,10 +245,9 @@ static NSString *MonthOverlayCellIdentifier = @"MonthOverlayCellIdentifier";
         //dayComponent.day = -1*i;
         NSDate *nextDate = [theCalendar dateByAddingComponents:dayComponent toDate:dateReference options:0];
         [pastDates addObject:nextDate];
-        [monthOverlayArray addObject:@"derp"];
     }
     
-}
+} 
 
 
 - (void) createFutureDatesWithReferencePoint:(NSDate*) dateReference{
@@ -250,7 +258,6 @@ static NSString *MonthOverlayCellIdentifier = @"MonthOverlayCellIdentifier";
         //dayComponent.day = 1*i;
         NSDate *nextDate = [theCalendar dateByAddingComponents:dayComponent toDate:dateReference options:0];
         [futureDates addObject:nextDate];
-        [monthOverlayArray addObject:@"future derp"];
     }
     
 }
@@ -306,12 +313,6 @@ static NSString *MonthOverlayCellIdentifier = @"MonthOverlayCellIdentifier";
         dayView.textLabel.textColor = [UIColor blackColor];
     }
     
-    //    if([self haveEventForDay:dayView.date]){
-    //        dayView.dotView.hidden = NO;
-    //    }
-    //    else{
-    //        dayView.dotView.hidden = YES;
-    //    }
 }
 
 - (void)calendar:(JTCalendarManager *)calendar didTouchDayView:(JTCalendarDayView *)dayView
@@ -350,15 +351,15 @@ static NSString *MonthOverlayCellIdentifier = @"MonthOverlayCellIdentifier";
 }
 
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-    NSLog(@"scrollViewWillBeginDragging");
+    //NSLog(@"scrollViewWillBeginDragging");
     [UIView transitionWithView:monthOverlay
                       duration:0.2
                        options:UIViewAnimationOptionCurveEaseOut
                     animations:^{
                         [self.view addSubview:monthOverlay];
-                        monthOverlay.alpha = 1.0f;
+                        monthOverlay.alpha = 0.50f;
                         monthTableOverlay.alpha = 1.0f;
-                        self.tableView.alpha = 0.5f;
+                        self.tableView.alpha = 0.25f;
                     }
                     completion:nil];
     
@@ -367,7 +368,7 @@ static NSString *MonthOverlayCellIdentifier = @"MonthOverlayCellIdentifier";
 }
 
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-    NSLog(@"scrollViewDidEndDecelerating");
+    //NSLog(@"scrollViewDidEndDecelerating");
     [UIView transitionWithView:monthOverlay
                       duration:0.2
                        options:UIViewAnimationOptionCurveEaseOut
@@ -385,16 +386,28 @@ static NSString *MonthOverlayCellIdentifier = @"MonthOverlayCellIdentifier";
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView;
 {
-//    UITableView *slaveTable = nil;
-//    
-//    if (self.table1 == scrollView) {
-//        slaveTable = self.table2;
-//    } else if (self.table2 == scrollView) {
-//        slaveTable = self.table1;
-//    }
     if (scrollView.tag == 6090) {
-        NSLog(@"scrollViewDidScroll at 6090");
+       // NSLog(@"scrollViewDidScroll at 6090");
         [monthTableOverlay setContentOffset:scrollView.contentOffset];
+    }
+}
+
+-(void) populateMonthOverlayArray {
+    
+    for (int i =0; i < [pastDates count]; i++) {
+        if ([calendarManager.dateHelper isThirdWeekOfTheMonth:[pastDates objectAtIndex:i]]) {
+            [monthOverlayArray addObject:[monthFormatter stringFromDate:[pastDates objectAtIndex:i]]];
+        } else {
+            [monthOverlayArray addObject:@""];
+        }
+    }
+    
+    for (int i =0; i < [futureDates count]; i++) {
+        if ([calendarManager.dateHelper isThirdWeekOfTheMonth:[futureDates objectAtIndex:i]]) {
+            [monthOverlayArray addObject:[monthFormatter stringFromDate:[futureDates objectAtIndex:i]]];
+        } else {
+            [monthOverlayArray addObject:@""];
+        }
     }
 }
 

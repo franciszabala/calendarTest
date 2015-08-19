@@ -32,4 +32,5 @@
 - (BOOL)date:(NSDate *)date isEqualOrAfter:(NSDate *)startDate andEqualOrBefore:(NSDate *)endDate;
 
 - (BOOL)isFirstDayOfTheMonth:(NSDate *) date;
+- (BOOL)isThirdWeekOfTheMonth:(NSDate *) date;
 @end
