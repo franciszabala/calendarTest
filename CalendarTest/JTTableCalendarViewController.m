@@ -76,6 +76,11 @@ static NSDateFormatter *monthFormatter = nil;
     [super viewDidLoad];
     [self.tableView registerClass:[JTWeekViewCell class] forCellReuseIdentifier:WeekViewCellIdentifier];
     
+    /**needed this as it might show views underneath the view (e.g. ecsliding)**/
+    self.view.opaque = YES;
+    self.view.alpha = 1.0f;
+    self.view.backgroundColor = [UIColor whiteColor];
+    
     calendarManager = [JTCalendarManager new];
     calendarManager.delegate = self;
     
@@ -101,6 +106,8 @@ static NSDateFormatter *monthFormatter = nil;
     topFrameClosed = CGRectMake(0.0f, origY, 320.0f, 100.0f);
     self.automaticallyAdjustsScrollViewInsets = NO;
     self.tableView = [[UITableView alloc] initWithFrame:topFrameOpened style:UITableViewStylePlain];
+    
+    
     
     fixedPointDate = [NSDate date];
     dayComponent = [[NSDateComponents alloc] init];
@@ -157,6 +164,10 @@ static NSDateFormatter *monthFormatter = nil;
     } else {
         return [combinationDates count];
     }
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 44;
 }
 
 // the cell will be returned to the tableView
@@ -379,9 +390,26 @@ static NSDateFormatter *monthFormatter = nil;
                     }
                     completion:^(BOOL finished){
                         [monthOverlay removeFromSuperview];
+                        NSArray *indexPathsForVisibleRows = [self.tableView indexPathsForVisibleRows];
+                        CGRect myRect = [self.tableView rectForRowAtIndexPath:[indexPathsForVisibleRows objectAtIndex:0]];
+                        //NSLog(@"myRect: %@", NSStringFromCGPoint(self.tableView.contentOffset));
+                        NSLog(@"myRect:%f : %f",self.tableView.contentOffset.y, (self.tableView.contentOffset.y / 44));
+                        
+                        double num = (self.tableView.contentOffset.y / 44);
+                        int intpart = (int)num;
+                        double decpart = num - intpart;
+                        printf("Num = %f, intpart = %d, decpart = %f\n", num, intpart, decpart);
+                        
+                        if (decpart > 0.5) {
+                            [self.tableView scrollToRowAtIndexPath:[indexPathsForVisibleRows objectAtIndex:1] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+                        } else {
+                            [self.tableView scrollToRowAtIndexPath:[indexPathsForVisibleRows objectAtIndex:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+                        }
+                        
+                        //
                     }];
     
-    
+    // NSLog(@"derped2");
 }
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView;
@@ -408,6 +436,38 @@ static NSDateFormatter *monthFormatter = nil;
         } else {
             [monthOverlayArray addObject:@""];
         }
+    }
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    NSLog(@"decelerate: %i", decelerate);
+    if (!decelerate) {
+        [UIView transitionWithView:monthOverlay
+                          duration:0.2
+                           options:UIViewAnimationOptionCurveEaseOut
+                        animations:^{
+                            monthOverlay.alpha = 0.0f;
+                            monthTableOverlay.alpha = 0.0f;
+                            self.tableView.alpha = 1.0f;
+                        }
+                        completion:^(BOOL finished){
+                            [monthOverlay removeFromSuperview];
+                            NSArray *indexPathsForVisibleRows = [self.tableView indexPathsForVisibleRows];
+                            CGRect myRect = [self.tableView rectForRowAtIndexPath:[indexPathsForVisibleRows objectAtIndex:0]];
+                            NSLog(@"myRect:%f : %f",self.tableView.contentOffset.y, (self.tableView.contentOffset.y / 44));
+                            
+                            double num = (self.tableView.contentOffset.y / 44);
+                            int intpart = (int)num;
+                            double decpart = num - intpart;
+                            printf("Num = %f, intpart = %d, decpart = %f\n", num, intpart, decpart);
+                            
+                            if (decpart > 0.5) {
+                                [self.tableView scrollToRowAtIndexPath:[indexPathsForVisibleRows objectAtIndex:1] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+                            } else {
+                                [self.tableView scrollToRowAtIndexPath:[indexPathsForVisibleRows objectAtIndex:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
+                            }
+                            
+                        }];
     }
 }
 
