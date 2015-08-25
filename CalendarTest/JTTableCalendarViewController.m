@@ -9,8 +9,7 @@
 #import "JTTableCalendarViewController.h"
 #import "JTCalendarWeek.h"
 #import "JTCalendarFirstDayOfTheMonthView.h"
-
-
+#import "JTCalendarWeekViewCell.h"
 
 @interface JTTableCalendarViewController () {
     NSArray *tableViewItems;
@@ -40,6 +39,9 @@
     
     UITableView *monthTableOverlay;
     UITableView *eventsTable;
+    
+    CGFloat screenWidth;
+    CGFloat screenHeight;
 }
 @end
 
@@ -81,16 +83,18 @@ static int EVENT_TABLE_TAG = 6092;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
+    screenWidth = [UIScreen mainScreen].bounds.size.width;
+    screenHeight = [UIScreen mainScreen].bounds.size.height;
     /**needed this as it might show views underneath the view (e.g. ecsliding)**/
     self.view.opaque = YES;
     self.view.alpha = 1.0f;
+    self.view.frame = CGRectMake(0.0f,0.0f, screenWidth,screenHeight);
     self.view.backgroundColor = [UIColor whiteColor];
     self.automaticallyAdjustsScrollViewInsets = NO;
     
     CGFloat origY = 65.0f;
-    topFrameOpened = CGRectMake(0.0f, origY, self.view.bounds.size.width, WEEK_HEIGHT * 5.0f);
-    topFrameClosed = CGRectMake(0.0f, origY, self.view.bounds.size.width, WEEK_HEIGHT * 2.0f);
+    topFrameOpened = CGRectMake(0.0f, origY, screenWidth, WEEK_HEIGHT * 5.0f);
+    topFrameClosed = CGRectMake(0.0f, origY, screenWidth, WEEK_HEIGHT * 2.0f);
     
     
     CGFloat topFrameOpenedYOffset = topFrameOpened.origin.y+topFrameOpened.size.height;
@@ -176,6 +180,7 @@ static int EVENT_TABLE_TAG = 6092;
         UITableViewCell *cell = (UITableViewCell *)[tableView dequeueReusableCellWithIdentifier:WeekViewCellIdentifier];
         if (cell == nil) {
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:WeekViewCellIdentifier];
+            [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
         }
     
         UIView<JTCalendarWeek> *weekView;
@@ -307,7 +312,7 @@ static int EVENT_TABLE_TAG = 6092;
                         dayView.circleView.hidden = NO;
                         dayView.circleView.transform = CGAffineTransformIdentity;
                     } completion:^(BOOL finished){
-                        NSLog(@"Done!");
+                        //NSLog(@"Done!");
                         //[calendarManager reload];
                         [self.tableView reloadData];
                    }];
@@ -326,6 +331,13 @@ static int EVENT_TABLE_TAG = 6092;
 
 - (UIView<JTCalendarDay> *)calendarBuildDayView:(JTCalendarManager *)calendar {
     return [JTCalendarFirstDayOfTheMonthView new];
+}
+
+- (UIView<JTCalendarWeek> *)calendarBuildWeekView:(JTCalendarManager *)calendar
+{
+    //return [JTCalendarWeekView new];
+    CGRect test = CGRectMake(0.0f, 0.0f, screenWidth, screenHeight);
+    return [[JTCalendarWeekViewCell alloc] initWithFrame:test];
 }
 
 #pragma mark - UIScrollView delegate
@@ -514,6 +526,9 @@ static int EVENT_TABLE_TAG = 6092;
     monthOverlay.userInteractionEnabled = NO;
 }
 
-
+//- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+//    UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+//    cell.contentView.backgroundColor = [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:0.0];
+//}
 
 @end

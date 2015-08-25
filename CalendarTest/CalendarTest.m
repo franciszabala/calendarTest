@@ -220,7 +220,7 @@
 }
 
 -(void) scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-    NSLog(@"%i", scrollView.tag);
+    //NSLog(@"%i", scrollView.tag);
     
     //check if top is minimized
 
@@ -262,7 +262,7 @@
                              bottomTableView.frame = bottomFrameClosed;
                          }
                          completion:^(BOOL finished){
-                             NSLog(@"Done!");
+                             //NSLog(@"Done!");
                              isTopOpen = true;
                              //calendarContentView.contentSize = CGSizeMake(320.0f, 250.0f);
 

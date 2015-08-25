@@ -7,14 +7,14 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>323D48CE-C470-4253-9A22-D2FC761D5B6F</string>
 	<key>IDESourceControlProjectName</key>
-	<string>project</string>
+	<string>CalendarTest</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>1F0C2D9D30E47DB49D0B07F6D9EA8AD9F119783A</key>
 		<string>https://github.com/franciszabala/calendarTest.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>CalendarTest.xcodeproj/project.xcworkspace</string>
+	<string>CalendarTest.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>1F0C2D9D30E47DB49D0B07F6D9EA8AD9F119783A</key>
