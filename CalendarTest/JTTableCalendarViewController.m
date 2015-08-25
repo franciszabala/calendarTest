@@ -100,8 +100,8 @@ static int EVENT_TABLE_TAG = 6092;
     CGFloat topFrameOpenedYOffset = topFrameOpened.origin.y+topFrameOpened.size.height;
     CGFloat topFrameClosedYOffset = topFrameClosed.origin.y+topFrameClosed.size.height;
     
-    bottomFrameOpened = CGRectMake(0.0f, topFrameClosedYOffset, self.view.bounds.size.width, self.view.bounds.size.height - (origY +topFrameClosedYOffset));
-    bottomFrameClosed = CGRectMake(0.0f, topFrameOpenedYOffset, self.view.bounds.size.width, self.view.bounds.size.height - (origY +topFrameOpenedYOffset));
+    bottomFrameOpened = CGRectMake(0.0f, topFrameClosedYOffset, self.view.bounds.size.width, self.view.bounds.size.height - (topFrameClosedYOffset));
+    bottomFrameClosed = CGRectMake(0.0f, topFrameOpenedYOffset, self.view.bounds.size.width, self.view.bounds.size.height - (topFrameOpenedYOffset));
     
     calendarManager = [JTCalendarManager new];
     calendarManager.delegate = self;
