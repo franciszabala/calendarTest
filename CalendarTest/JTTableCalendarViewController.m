@@ -18,28 +18,16 @@
     NSDateComponents *dayComponent;
     NSCalendar *theCalendar;
     NSDate *fixedPointDate;
-    
-    NSDate *movingPointDate;
-    
     NSMutableArray *combinationDates;
-    
     NSMutableArray *monthOverlayArray;
-    
-    
-    
     CGRect topFrameOpened;
     CGRect topFrameClosed;
-    
     CGRect bottomFrameOpened;
     CGRect bottomFrameClosed;
-    
     NSDate *_dateSelected;
-    
     UIView *monthOverlay;
-    
     UITableView *monthTableOverlay;
     UITableView *eventsTable;
-    
     CGFloat screenWidth;
     CGFloat screenHeight;
 }
